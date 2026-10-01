@@ -1,303 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lector de Facturas - Paraguay</title>
-
-  <!-- Librería para decodificación de códigos QR -->
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 0 15px;
-      color: #333;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .upload-section {
-      border: 2px dashed #ccc;
-      padding: 20px;
-      text-align: center;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-    }
-    .preview-container {
-      max-width: 100%;
-      text-align: center;
-    }
-    img#imagePreview {
-      max-width: 100%;
-      max-height: 400px;
-      border-radius: 4px;
-      display: none;
-      margin: 10px auto;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 12px;
-    }
-    label {
-      font-weight: bold;
-      margin-bottom: 4px;
-      font-size: 0.9em;
-    }
-    input[type="text"] {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 1em;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background-color: #aaa;
-    }
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.85em;
-      font-weight: bold;
-      margin-top: 5px;
-    }
-    .badge-success { background-color: #d4edda; color: #155724; }
-    .badge-info { background-color: #d1ecf1; color: #0c5460; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Básica HTML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #007bff;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-
-  <h1>Procesador de Facturas y Comprobantes (DNIT)</h1>
-  <p>Soporta facturas pre-impresas, tickets de caja y facturas electrónicas con QR.</p>
-
-  <div class="container">
-    <!-- Carga de Imagen -->
-    <div class="upload-section">
-      <input type="file" id="fileInput" accept="image/*" onchange="cargarImagen(event)">
-      <div class="preview-container">
-        <img id="imagePreview" alt="Vista previa de la factura">
-      </div>
-      <button id="btnProcesar" onclick="procesarDocumento()" disabled>Procesar Factura</button>
-      <div id="statusMessage"></div>
+    <div class="container">
+        <h1>¡Hola!</h1>
+        <p>Este es un archivo de plantilla HTML generado para descargar.</p>
+        <p>Puedes editar este archivo con cualquier editor de texto o código.</p>
     </div>
-
-    <!-- Formulario con Datos Extraídos -->
-    <form id="facturaForm">
-      <div class="grid">
-        <div class="form-group">
-          <label for="rucEmisor">RUC Emisor / Proveedor:</label>
-          <input type="text" id="rucEmisor" placeholder="Ej: 80092500-9">
-        </div>
-        <div class="form-group">
-          <label for="razonSocialEmisor">Razón Social Emisor:</label>
-          <input type="text" id="razonSocialEmisor" placeholder="Ej: REPUESTOS RG S.A.">
-        </div>
-        <div class="form-group">
-          <label for="numFactura">Nº Factura / Comprobante:</label>
-          <input type="text" id="numFactura" placeholder="Ej: 001-001-0063085">
-        </div>
-        <div class="form-group">
-          <label for="fechaEmision">Fecha de Emisión:</label>
-          <input type="text" id="fechaEmision" placeholder="DD/MM/AAAA">
-        </div>
-        <div class="form-group">
-          <label for="rucCliente">RUC / C.I. Cliente:</label>
-          <input type="text" id="rucCliente" placeholder="Ej: 30270693">
-        </div>
-        <div class="form-group">
-          <label for="clienteNombre">Nombre / Razón Social Cliente:</label>
-          <input type="text" id="clienteNombre" placeholder="Ej: ENRIQUE RODRIGUEZ">
-        </div>
-        <div class="form-group">
-          <label for="montoTotal">Total a Pagar (Gs.):</label>
-          <input type="text" id="montoTotal" placeholder="Ej: 600100">
-        </div>
-        <div class="form-group">
-          <label for="iva10">IVA 10% (Gs.):</label>
-          <input type="text" id="iva10" placeholder="Ej: 54555">
-        </div>
-        <div class="form-group">
-          <label for="iva5">IVA 5% (Gs.):</label>
-          <input type="text" id="iva5" placeholder="Ej: 0">
-        </div>
-        <div class="form-group">
-          <label for="cdc">CDC (Solo Factura Electrónica):</label>
-          <input type="text" id="cdc" placeholder="44 dígitos" readonly>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <script>
-    let imagenCargada = false;
-
-    function cargarImagen(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = document.getElementById('imagePreview');
-          img.src = e.target.result;
-          img.style.display = 'block';
-          document.getElementById('btnProcesar').disabled = false;
-          imagenCargada = true;
-          limpiarFormulario();
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function limpiarFormulario() {
-      document.getElementById('facturaForm').reset();
-      document.getElementById('statusMessage').innerHTML = '';
-    }
-
-    /**
-     * 1. LECTURA DE CÓDIGO QR (Facturas Electrónicas / e-Kuatia)
-     */
-    function leerCodigoQR(imageElement) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = imageElement.naturalWidth || imageElement.width;
-      canvas.height = imageElement.naturalHeight || imageElement.height;
-      ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-      if (code && code.data) {
-        return parsearQReKuatia(code.data);
-      }
-      return null;
-    }
-
-    function parsearQReKuatia(qrUrl) {
-      try {
-        const urlParams = new URLSearchParams(qrUrl.split('?')[1]);
-        const cdc = urlParams.get('cdc') || '';
-
-        if (cdc && cdc.length === 44) {
-          const rucBase = cdc.substring(2, 10).replace(/^0+/, '');
-          const rucDv = cdc.substring(10, 11);
-          const est = cdc.substring(11, 14);
-          const pe = cdc.substring(14, 17);
-          const num = cdc.substring(17, 24);
-          const anio = cdc.substring(25, 29);
-          const mes = cdc.substring(29, 31);
-          const dia = cdc.substring(31, 33);
-
-          return {
-            ruc_emisor: `${rucBase}-${rucDv}`,
-            numero_factura: `${est}-${pe}-${num}`,
-            fecha_emision: `${dia}/${mes}/${anio}`,
-            cdc: cdc,
-            esQrValido: true
-          };
-        }
-      } catch (e) {
-        console.error("Error analizando QR:", e);
-      }
-      return null;
-    }
-
-    /**
-     * 2. PROCESAMIENTO PRINCIPAL
-     */
-    async function procesarDocumento() {
-      if (!imagenCargada) return;
-
-      const imgElement = document.getElementById('imagePreview');
-      const statusDiv = document.getElementById('statusMessage');
-      statusDiv.innerHTML = '<span>Procesando imagen...</span>';
-
-      // Paso A: Intentar decodificar código QR
-      const datosQR = leerCodigoQR(imgElement);
-
-      if (datosQR && datosQR.esQrValido) {
-        statusDiv.innerHTML = '<span class="badge badge-success">¡Código QR e-Kuatia detectado!</span>';
-        document.getElementById('rucEmisor').value = datosQR.ruc_emisor;
-        document.getElementById('numFactura').value = datosQR.numero_factura;
-        document.getElementById('fechaEmision').value = datosQR.fecha_emision;
-        document.getElementById('cdc').value = datosQR.cdc;
-      } else {
-        statusDiv.innerHTML = '<span class="badge badge-info">Documento físico / Lectura por OCR</span>';
-      }
-
-      // Paso B: Llamada a la API de Gemini para extraer el resto de los campos
-      await procesarFacturaConIA(imgElement.src, datosQR);
-    }
-
-    /**
-     * 3. PROMPT Y PETICIÓN A LA IA (Gemini Vision)
-     */
-    async function procesarFacturaConIA(base64Image, datosQR) {
-      const promptText = `
-        Eres un sistema experto contable procesando comprobantes tributarios de Paraguay (DNIT/SET).
-        Analiza la imagen adjunta (puede ser Factura Tradicional Impresa/Manuscrita, Ticket Térmico de Caja o Factura Electrónica).
-
-        Extrae los siguientes datos en formato JSON de forma estricta:
-
-        1. ruc_emisor: RUC del emisor/proveedor con su dígito verificador.
-        2. razon_social_emisor: Nombre comercial o Razón Social del vendedor.
-        3. numero_factura: Número completo del comprobante (ej: 001-001-0063085).
-        4. fecha_emision: Fecha impresa o manuscrita (DD/MM/AAAA).
-        5. ruc_cliente: RUC o CI del comprador.
-        6. cliente_nombre: Nombre o Razón Social del cliente.
-        7. total: Monto 'TOTAL A PAGAR' como valor entero sin puntos ni símbolos (ej: 600100).
-        8. iva10: Monto del IVA 10% como valor entero sin puntos (ej: 54555).
-        9. iva5: Monto del IVA 5% como valor entero sin puntos (ej: 0).
-
-        Responde ÚNICAMENTE con el objeto JSON válido.
-      `;
-
-      try {
-        // AQUÍ INTEGRAS LA LLAMADA A TU BACKEND O A LA API DE GEMINI
-        // Ejemplo de estructura de recepción:
-        /*
-        const response = await fetch('/api/analizar-factura', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64Image, prompt: promptText })
-        });
-        const data = await response.json();
-        
-        // Rellenar formulario si el QR no había extraído el campo previamente
-        if (!datosQR) {
-          document.getElementById('rucEmisor').value = data.ruc_emisor || '';
-          document.getElementById('numFactura').value = data.numero_factura || '';
-          document.getElementById('fechaEmision').value = data.fecha_emision || '';
-        }
-        
-        document.getElementById('razonSocialEmisor').value = data.razon_social_emisor || '';
-        document.getElementById('rucCliente').value = data.ruc_cliente || '';
-        document.getElementById('clienteNombre').value = data.cliente_nombre || '';
-        document.getElementById('montoTotal').value = data.total || '';
-        document.getElementById('iva10').value = data.iva10 || '';
-        document.getElementById('iva5').value = data.iva5 || '';
-        */
-      } catch (error) {
-        console.error("Error al comunicarse con la IA:", error);
-      }
-    }
-  </script>
 </body>
 </html>
